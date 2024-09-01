@@ -149,7 +149,8 @@ const App = () => {
       <Rive
         src="/ayy_section.riv"
         stateMachines="State Machine 1"
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5, transform: 'scale(1.3)' }}
+        // style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5, transform: 'scale(1.3)' }}
+        className="rive-animation"
       
       />
 
