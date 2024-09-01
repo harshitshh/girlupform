@@ -27,28 +27,48 @@ const App = () => {
   const mountRef = useRef(null);
 
   useEffect(() => {
+    // Three.js setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff6ad5, wireframe: true });
-    const torus = new THREE.Mesh(geometry, material);
-    scene.add(torus);
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    for (let i = 0; i < 10000; i++) {
+      const x = THREE.MathUtils.randFloatSpread(2000);
+      const y = THREE.MathUtils.randFloatSpread(2000);
+      const z = THREE.MathUtils.randFloatSpread(2000);
+      vertices.push(x, y, z);
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
-    camera.position.z = 30;
+    const material = new THREE.PointsMaterial({ color: 0x888888 });
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
 
-    // const animate = () => {
-    //   requestAnimationFrame(animate);
-    //   torus.rotation.x += 0.01;
-    //   torus.rotation.y += 0.01;
-    //   renderer.render(scene, camera);
-    // };
-    // animate();
+    camera.position.z = 1000;
 
+    const animate = function () {
+      requestAnimationFrame(animate);
+      points.rotation.x += 0.0005;
+      points.rotation.y += 0.001;
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    // Handle window resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
     return () => {
+      window.removeEventListener('resize', handleResize);
       mountRef.current.removeChild(renderer.domElement);
     };
   }, []);
@@ -119,10 +139,18 @@ const App = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+     <img
+        src="/loog.png"
+        alt="Logo"
+        className="absolute top-6 left-1/2 transform -translate-x-1/2 z-20"
+        style={{ width: '250px', height: '250px' }} // Adjust the size as needed
+      />
+      
       <Rive
         src="/ayy_section.riv"
         stateMachines="State Machine 1"
         style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5, transform: 'scale(1.3)' }}
+      
       />
 
       <div className="absolute inset-0" ref={mountRef}></div>
